@@ -39,15 +39,15 @@
 
 ## User
 
-Endpoint to create new user read <a href="https://github.com/Roisfaozi/coffee-shop/blob/main/docs/user.md" target="blank">this documentation</a>
+Endpoint to create new User read <a href="https://github.com/Roisfaozi/coffee-shop/blob/main/docs/user.md" target="blank">this documentation</a>
 
 ## Products
 
-Endpoint to create new user read <a href="https://github.com/Roisfaozi/coffee-shop/blob/main/docs/product.md" target="blank">this documentation</a>
+Endpoint to create new uProductsser read <a href="https://github.com/Roisfaozi/coffee-shop/blob/main/docs/product.md" target="blank">this documentation</a>
 
-## Products
+## Favorite
 
-Endpoint to create new user read <a href="https://github.com/Roisfaozi/coffee-shop/blob/main/docs/favorite.md" target="blank">this documentation</a>
+Endpoint to create new Favorite read <a href="https://github.com/Roisfaozi/coffee-shop/blob/main/docs/favorite.md" target="blank">this documentation</a>
 
 ## 🛠️ Installation Steps
 
