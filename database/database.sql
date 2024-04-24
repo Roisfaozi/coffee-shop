@@ -33,6 +33,7 @@ CREATE TABLE product
     currency    VARCHAR,
     description VARCHAR,
     image_url   VARCHAR,
+    category    VARCHAR,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -60,9 +61,13 @@ CREATE TABLE favorite
 INSERT INTO users (username, email, role) VALUES ('coba1', 'coba1@example.com', 'coba1');
 
 truncate TABLE product cascade;
+truncate TABLE size cascade;
+truncate TABLE product_size cascade;
+truncate TABLE favorite cascade;
+truncate TABLE users cascade;
 
 select * from product where id = '4fbbc3a2-8516-4d9b-a5e5-5b64790237d6';
-select * from users;
+select * from favorite;
 
 insert into size(size_name) values ('R');
 insert into size(size_name) values ('L');
@@ -74,3 +79,17 @@ FROM product p
          LEFT JOIN product_size ps ON p.id = ps.product_id
          LEFT JOIN size s ON ps.size_id = s.id
 WHERE p.id = 'f573f841-c04b-4af3-9a46-e79f4ac94d68';
+
+SELECT p.id, p.name, p.price, p.currency, p.description, p.image_url, p.category, p.created_at, p.updated_at,
+       s.id as size_id, s.size_name
+FROM product p
+         LEFT JOIN product_size ps ON p.id = ps.product_id
+         LEFT JOIN size s ON ps.size_id = s.id;
+SELECT DISTINCT p.id, p.name, p.price, p.currency, p.description, p.image_url, p.category, p.created_at, p.updated_at,
+                s.id as size_id, s.size_name
+FROM product p
+         LEFT JOIN product_size ps ON p.id = ps.product_id
+         LEFT JOIN size s ON ps.size_id = s.id;
+WHERE p.category ILIKE '%e%'
+ORDER BY p.id LIMIT 10 OFFSET 0;
+

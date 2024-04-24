@@ -13,7 +13,7 @@ func favorite(g *gin.Engine, d *sqlx.DB) {
 	repo := repository.NewFavoriteRepositoryImpl(d)
 	handler := handlers.NewFavoriteHandlerImpl(repo)
 
-	router.POST("/", handler.CreateFavorite)
+	router.POST("/:userId", handler.CreateFavorite)
 	router.DELETE("/:id", handler.DeleteFavorite)
 	router.GET("/:userId", handler.GetFavoritesByUserID)
 

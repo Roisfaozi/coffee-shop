@@ -9,9 +9,10 @@ type Product struct {
 	Currency    string    `json:"currency" db:"currency"`
 	Description string    `json:"description" db:"description"`
 	ImageURL    string    `json:"image_url" db:"image_url"`
+	Category    string    `json:"category" db:"category"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
-	Sizes       []*Size   `json:"sizes,omitempty"`
+	Sizes       []*Size   `json:"sizes,omitempty" db:"-"`
 }
 
 type Size struct {
@@ -30,6 +31,7 @@ type ProductRequest struct {
 	Currency    string   `json:"currency" binding:"required"`
 	Description string   `json:"description"`
 	ImageURL    string   `json:"image_url"`
+	Category    string   `json:"category"`
 	SizeIDs     []string `json:"size_ids"`
 }
 

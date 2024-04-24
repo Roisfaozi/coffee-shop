@@ -79,7 +79,6 @@ func (fr FavoriteRepositoryImpl) GetFavoritesByUserID(ctx context.Context, userI
 		}
 		favorites = append(favorites, &favorite)
 	}
-
 	return favorites, nil
 }
 

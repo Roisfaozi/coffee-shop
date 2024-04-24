@@ -12,12 +12,14 @@ type FavoriteHandlerImpl struct {
 }
 
 func (fh FavoriteHandlerImpl) CreateFavorite(c *gin.Context) {
+	userID := c.Param("userId")
+
 	var request models.FavoriteRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	request.UserID = userID
 	favorite, err := fh.favoriteRepo.CreateFavorite(c.Request.Context(), &request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -48,7 +50,6 @@ func (fh FavoriteHandlerImpl) GetFavoritesByUserID(c *gin.Context) {
 		return
 	}
 
-	// Mengembalikan daftar favorit
 	c.JSON(http.StatusOK, favorites)
 }
 

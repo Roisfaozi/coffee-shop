@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/Roisfaozi/coffee-shop/internal/models"
@@ -14,7 +12,11 @@ type ProductRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func (pr ProductRepositoryImpl) CreateProduct(ctx context.Context, product *models.ProductRequest) (*models.ProductResponse, error) {
+func NewProductRepositoryImpl(db *sqlx.DB) *ProductRepositoryImpl {
+	return &ProductRepositoryImpl{db}
+}
+
+func (pr *ProductRepositoryImpl) CreateProduct(ctx context.Context, product *models.ProductRequest) (*models.ProductResponse, error) {
 	tx, err := pr.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -24,17 +26,15 @@ func (pr ProductRepositoryImpl) CreateProduct(ctx context.Context, product *mode
 			_ = tx.Rollback()
 		}
 	}()
-	fmt.Println(product)
 
-	query := `INSERT INTO product (name, price, currency, description, image_url, created_at, updated_at)
-			  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
+	query := `INSERT INTO product (name, price, currency, description, image_url, category, created_at, updated_at)
+			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 	var productID string
-	err = tx.QueryRowContext(ctx, query, product.Name, product.Price, product.Currency, product.Description, product.ImageURL, time.Now(), time.Now()).Scan(&productID)
+	err = tx.QueryRowContext(ctx, query, product.Name, product.Price, product.Currency, product.Description, product.ImageURL, product.Category, time.Now(), time.Now()).Scan(&productID)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, err
 	}
-
 	var sizeIDs []string
 	rows, err := tx.QueryContext(ctx, "SELECT id FROM size")
 	if err != nil {
@@ -67,7 +67,7 @@ func (pr ProductRepositoryImpl) CreateProduct(ctx context.Context, product *mode
 	return &models.ProductResponse{ID: productID}, nil
 }
 
-func (pr ProductRepositoryImpl) UpdateProduct(ctx context.Context, productID string, product *models.ProductRequest) error {
+func (pr *ProductRepositoryImpl) UpdateProduct(ctx context.Context, productID string, product *models.ProductRequest) error {
 	tx, err := pr.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
@@ -78,14 +78,8 @@ func (pr ProductRepositoryImpl) UpdateProduct(ctx context.Context, productID str
 		}
 	}()
 
-	query := `UPDATE product SET name=$1, price=$2, currency=$3, description=$4, image_url=$5, updated_at=$6 WHERE id=$7`
-	_, err = tx.ExecContext(ctx, query, product.Name, product.Price, product.Currency, product.Description, product.ImageURL, time.Now(), productID)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	_, err = tx.ExecContext(ctx, "DELETE FROM product_size WHERE product_id=$1", productID)
+	query := `UPDATE product SET name=$1, price=$2, currency=$3, description=$4, image_url=$5, category=$6, updated_at=$7 WHERE id=$8`
+	_, err = tx.ExecContext(ctx, query, product.Name, product.Price, product.Currency, product.Description, product.ImageURL, product.Category, time.Now(), productID)
 	if err != nil {
 		_ = tx.Rollback()
 		return err
@@ -99,15 +93,14 @@ func (pr ProductRepositoryImpl) UpdateProduct(ctx context.Context, productID str
 		}
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.Commit(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (pr ProductRepositoryImpl) DeleteProduct(ctx context.Context, productID string) error {
+func (pr *ProductRepositoryImpl) DeleteProduct(ctx context.Context, productID string) error {
 	tx, err := pr.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
@@ -130,88 +123,72 @@ func (pr ProductRepositoryImpl) DeleteProduct(ctx context.Context, productID str
 		return err
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.Commit(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (pr ProductRepositoryImpl) GetAllProducts(ctx context.Context, foodType string, page, limit int) ([]*models.Product, error) {
+func (pr *ProductRepositoryImpl) GetAllProducts(ctx context.Context, foodType string, page, limit int) ([]*models.Product, error) {
 	offset := (page - 1) * limit
 
-	query := `
-        SELECT p.id, p.name, p.price, p.currency, p.description, p.image_url, p.created_at, p.updated_at,
-               s.id as size_id, s.size_name
+	productQuery := `
+        SELECT p.id, p.name, p.price, p.currency, p.description, p.image_url, p.category, p.created_at, p.updated_at
         FROM product p
-        LEFT JOIN product_size ps ON p.id = ps.product_id
-        LEFT JOIN size s ON ps.size_id = s.id
-        
+        WHERE p.category ILIKE '%' || $1 || '%'
+        ORDER BY p.id LIMIT $2 OFFSET $3
     `
 
-	// if foodType != "" {
-	// 	query += ` AND p.food_type = $1`
-	// }
+	sizeQuery := `
+        SELECT ps.product_id, s.id as size_id, s.size_name
+        FROM product_size ps
+        JOIN size s ON ps.size_id = s.id
+    `
 
-	query += ` ORDER BY p.id LIMIT $2 OFFSET $3`
-
-	rows, err := pr.db.QueryContext(ctx, query, foodType, limit, offset)
+	rows, err := pr.db.QueryContext(ctx, productQuery, foodType, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	productsMap := make(map[string]*models.Product)
+	productMap := make(map[string]*models.Product)
 	for rows.Next() {
-		var (
-			productID       string
-			productName     string
-			productPrice    int
-			productCurrency string
-			productDesc     string
-			productImageURL string
-			createdAt       time.Time
-			updatedAt       time.Time
-			sizeID          sql.NullString
-			sizeName        sql.NullString
-		)
-		if err := rows.Scan(&productID, &productName, &productPrice, &productCurrency, &productDesc, &productImageURL, &createdAt, &updatedAt, &sizeID, &sizeName); err != nil {
+		var product models.Product
+		if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Currency, &product.Description, &product.ImageURL, &product.Category, &product.CreatedAt, &product.UpdatedAt); err != nil {
+			return nil, err
+		}
+		productMap[product.ID] = &product
+	}
+
+	rows, err = pr.db.QueryContext(ctx, sizeQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var productID, sizeID, sizeName string
+		if err := rows.Scan(&productID, &sizeID, &sizeName); err != nil {
 			return nil, err
 		}
 
-		product, ok := productsMap[productID]
-		if !ok {
-			product = &models.Product{
-				ID:          productID,
-				Name:        productName,
-				Price:       productPrice,
-				Currency:    productCurrency,
-				Description: productDesc,
-				ImageURL:    productImageURL,
-				CreatedAt:   createdAt,
-				UpdatedAt:   updatedAt,
-				Sizes:       []*models.Size{},
-			}
-			productsMap[productID] = product
-		}
-
-		if sizeID.Valid && sizeName.Valid {
+		if product, ok := productMap[productID]; ok {
 			product.Sizes = append(product.Sizes, &models.Size{
-				ID:       sizeID.String,
-				SizeName: sizeName.String,
+				ID:       sizeID,
+				SizeName: sizeName,
 			})
 		}
 	}
 
-	products := make([]*models.Product, 0, len(productsMap))
-	for _, product := range productsMap {
+	var products []*models.Product
+	for _, product := range productMap {
 		products = append(products, product)
 	}
-
 	return products, nil
 }
-func (pr ProductRepositoryImpl) GetProductByID(ctx context.Context, productID string) (*models.Product, error) {
+
+func (pr *ProductRepositoryImpl) GetProductByID(ctx context.Context, productID string) (*models.Product, error) {
 	query := `SELECT * FROM product WHERE id=$1`
 	var product models.Product
 	err := pr.db.GetContext(ctx, &product, query, productID)
@@ -231,7 +208,6 @@ func (pr ProductRepositoryImpl) GetProductByID(ctx context.Context, productID st
 	}
 	defer rows.Close()
 
-	// Kumpulkan semua ukuran terkait ke dalam produk
 	for rows.Next() {
 		var size models.Size
 		if err := rows.StructScan(&size); err != nil {
@@ -241,7 +217,4 @@ func (pr ProductRepositoryImpl) GetProductByID(ctx context.Context, productID st
 	}
 
 	return &product, nil
-}
-func NewProductRepositoryImpl(db *sqlx.DB) *ProductRepositoryImpl {
-	return &ProductRepositoryImpl{db}
 }

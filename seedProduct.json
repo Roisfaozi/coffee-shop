@@ -1,0 +1,162 @@
+[
+  {
+    "name": "Nasi Goreng",
+    "price": 30000,
+    "currency": "IDR",
+    "description": "Deskripsi produk nasi goreng yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/nasigoreng.jpg"
+  },
+  {
+    "name": "Ayam Goreng",
+    "price": 25000,
+    "currency": "IDR",
+    "description": "Deskripsi produk ayam goreng yang gurih",
+    "category": "Makanan",
+    "image_url": "https://example.com/ayamgoreng.jpg"
+  },
+  {
+    "name": "Sate Ayam",
+    "price": 35000,
+    "currency": "IDR",
+    "description": "Deskripsi produk sate ayam yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/sateayam.jpg"
+  },
+  {
+    "name": "Mie Goreng",
+    "price": 28000,
+    "currency": "IDR",
+    "description": "Deskripsi produk mie goreng yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/miegoreng.jpg"
+  },
+  {
+    "name": "Bakso",
+    "price": 20000,
+    "currency": "IDR",
+    "description": "Deskripsi produk bakso yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/bakso.jpg"
+  },
+  {
+    "name": "Es Teh Manis",
+    "price": 8000,
+    "currency": "IDR",
+    "description": "Deskripsi produk es teh manis yang segar",
+    "category": "Minuman",
+    "image_url": "https://example.com/estehmanis.jpg"
+  },
+  {
+    "name": "Es Jeruk",
+    "price": 10000,
+    "currency": "IDR",
+    "description": "Deskripsi produk es jeruk yang segar",
+    "category": "Minuman",
+    "image_url": "https://example.com/esjeruk.jpg"
+  },
+  {
+    "name": "Jus Alpukat",
+    "price": 15000,
+    "currency": "IDR",
+    "description": "Deskripsi produk jus alpukat yang segar",
+    "category": "Minuman",
+    "image_url": "https://example.com/jusalpukat.jpg"
+  },
+  {
+    "name": "Jus Mangga",
+    "price": 12000,
+    "currency": "IDR",
+    "description": "Deskripsi produk jus mangga yang segar",
+    "category": "Minuman",
+    "image_url": "https://example.com/jusmangga.jpg"
+  },
+  {
+    "name": "Kopi Tubruk",
+    "price": 15000,
+    "currency": "IDR",
+    "description": "Deskripsi produk kopi tubruk yang nikmat",
+    "category": "Minuman",
+    "image_url": "https://example.com/kopitubruk.jpg"
+  },
+  {
+    "name": "Nasi Uduk",
+    "price": 25000,
+    "currency": "IDR",
+    "description": "Deskripsi produk nasi uduk yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/nasiuduk.jpg"
+  },
+  {
+    "name": "Soto Ayam",
+    "price": 30000,
+    "currency": "IDR",
+    "description": "Deskripsi produk soto ayam yang nikmat",
+    "category": "Makanan",
+    "image_url": "https://example.com/sotoayam.jpg"
+  },
+  {
+    "name": "Pisang Goreng",
+    "price": 10000,
+    "currency": "IDR",
+    "description": "Deskripsi produk pisang goreng yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/pisanggoreng.jpg"
+  },
+  {
+    "name": "Martabak Manis",
+    "price": 20000,
+    "currency": "IDR",
+    "description": "Deskripsi produk martabak manis yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/martabakmanis.jpg"
+  },
+  {
+    "name": "Nasi Kuning",
+    "price": 18000,
+    "currency": "IDR",
+    "description": "Deskripsi produk nasi kuning yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/nasikuning.jpg"
+  },
+  {
+    "name": "Sate Padang",
+    "price": 40000,
+    "currency": "IDR",
+    "description": "Deskripsi produk sate padang yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/satepadang.jpg"
+  },
+  {
+    "name": "Ketoprak",
+    "price": 15000,
+    "currency": "IDR",
+    "description": "Deskripsi produk ketoprak yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/ketoprak.jpg"
+  },
+  {
+    "name": "Lontong Sayur",
+    "price": 20000,
+    "currency": "IDR",
+    "description": "Deskripsi produk lontong sayur yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/lontongsayur.jpg"
+  },
+  {
+    "name": "Pecel Lele",
+    "price": 25000,
+    "currency": "IDR",
+    "description": "Deskripsi produk pecel lele yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/pecellele.jpg"
+  },
+  {
+    "name": "Bakmi Goreng",
+    "price": 28000,
+    "currency": "IDR",
+    "description": "Deskripsi produk bakmi goreng yang lezat",
+    "category": "Makanan",
+    "image_url": "https://example.com/bakmigoreng.jpg"
+  }
+]

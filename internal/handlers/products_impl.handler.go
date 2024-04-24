@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -35,7 +34,7 @@ func (ph ProductHandlerImpl) CreateProduct(c *gin.Context) {
 }
 
 func (ph ProductHandlerImpl) UpdateProduct(c *gin.Context) {
-	fmt.Println("lele")
+
 	productID := c.Param("id")
 	var productReq models.ProductRequest
 	if err := c.ShouldBindJSON(&productReq); err != nil {
