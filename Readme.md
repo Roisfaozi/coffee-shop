@@ -18,6 +18,13 @@
 ├── README.md
 ├── cmd
 │   └── main.go
+├── database
+│   └── database.sql
+├── exception
+│   ├── error_handler.go
+│   └── not_found_error.go
+├── helper
+│   └── error.go
 ├── internals
 │   ├── handlers
 │   ├── models
@@ -28,12 +35,24 @@
     └── db.go
 ```
 
+# API Specification
+
+## User
+Endpoint to create new user read <a href="https://github.com/Roisfaozi/coffee-shop/docs/user.md" target="blank">this documentation</a>
+
+## Products
+Endpoint to create new user read <a href="https://github.com/Roisfaozi/coffee-shop/docs/product.md" target="blank">this documentation</a>
+## Products
+Endpoint to create new user read <a href="https://github.com/Roisfaozi/coffee-shop/docs/favorite.md" target="blank">this documentation</a>
+
+
+
 ## 🛠️ Installation Steps
 
 1. Clone the repository
 
 ```bash
-git clone https://github.com/biFebriansyah/FWG19.BackendGo.git
+git clone https://github.com/Roisfaozi/coffee-shop.git
 ```
 
 2. Install dependencies
