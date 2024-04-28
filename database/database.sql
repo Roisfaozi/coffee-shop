@@ -67,7 +67,7 @@ truncate TABLE favorite cascade;
 truncate TABLE users cascade;
 
 select * from product where id = '4fbbc3a2-8516-4d9b-a5e5-5b64790237d6';
-select * from favorite;
+select * from users;
 
 insert into size(size_name) values ('R');
 insert into size(size_name) values ('L');
@@ -89,7 +89,8 @@ SELECT DISTINCT p.id, p.name, p.price, p.currency, p.description, p.image_url, p
                 s.id as size_id, s.size_name
 FROM product p
          LEFT JOIN product_size ps ON p.id = ps.product_id
-         LEFT JOIN size s ON ps.size_id = s.id;
-WHERE p.category ILIKE '%e%'
-ORDER BY p.id LIMIT 10 OFFSET 0;
+         LEFT JOIN size s ON ps.size_id = s.id
+WHERE p.category ILIKE '%makanan%'
+ORDER BY p.id LIMIT 10 OFFSET 2;
 
+SELECT id, username, "role", "password" FROM users WHERE username = 'Testing-1713977486';

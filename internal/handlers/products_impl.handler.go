@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"github.com/Roisfaozi/coffee-shop/config"
+	"github.com/Roisfaozi/coffee-shop/pkg"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -20,17 +23,24 @@ func NewProductHandlerImpl(productRepo repository.ProductRepository) *ProductHan
 func (ph ProductHandlerImpl) CreateProduct(c *gin.Context) {
 	var productReq models.ProductRequest
 	if err := c.ShouldBindJSON(&productReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		log.Println(err)
+		pkg.NewRes(http.StatusBadRequest, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
 		return
 	}
 
 	productRes, err := ph.productRepo.CreateProduct(c.Request.Context(), &productReq)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Println(err)
+		pkg.NewRes(http.StatusInternalServerError, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
 		return
 	}
-
-	c.JSON(http.StatusCreated, productRes)
+	pkg.NewRes(http.StatusCreated, productRes).Send(c)
 }
 
 func (ph ProductHandlerImpl) UpdateProduct(c *gin.Context) {
@@ -38,29 +48,66 @@ func (ph ProductHandlerImpl) UpdateProduct(c *gin.Context) {
 	productID := c.Param("id")
 	var productReq models.ProductRequest
 	if err := c.ShouldBindJSON(&productReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		log.Println(err)
+		pkg.NewRes(http.StatusBadRequest, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
 		return
 	}
 
-	err := ph.productRepo.UpdateProduct(c.Request.Context(), productID, &productReq)
+	_, err := ph.productRepo.GetProductByID(c.Request.Context(), productID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Println(err)
+		pkg.NewRes(http.StatusNotFound, &config.Result{
+			Data:    nil,
+			Message: "Product not found",
+		}).Send(c)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Product updated successfully"})
+	err = ph.productRepo.UpdateProduct(c.Request.Context(), productID, &productReq)
+	if err != nil {
+		log.Println(err)
+		pkg.NewRes(http.StatusInternalServerError, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
+		return
+	}
+	pkg.NewRes(http.StatusOK, &config.Result{
+		Data:    nil,
+		Message: " Product updated successfully",
+	}).Send(c)
 }
 
 func (ph ProductHandlerImpl) DeleteProduct(c *gin.Context) {
 	productID := c.Param("id")
 
-	err := ph.productRepo.DeleteProduct(c.Request.Context(), productID)
+	_, err := ph.productRepo.GetProductByID(c.Request.Context(), productID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Println(err)
+		pkg.NewRes(http.StatusNotFound, &config.Result{
+			Data:    nil,
+			Message: "Product not found",
+		}).Send(c)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
+	err = ph.productRepo.DeleteProduct(c.Request.Context(), productID)
+	if err != nil {
+		log.Println(err)
+		pkg.NewRes(http.StatusInternalServerError, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
+		return
+	}
+	pkg.NewRes(http.StatusOK, &config.Result{
+		Data:    nil,
+		Message: "Product deleted successfully",
+	}).Send(c)
+
 }
 
 func (ph ProductHandlerImpl) GetAllProducts(c *gin.Context) {
@@ -69,33 +116,50 @@ func (ph ProductHandlerImpl) GetAllProducts(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page < 1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number"})
+		log.Println(err)
+		pkg.NewRes(http.StatusBadRequest, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
+
 		return
 	}
 
 	limitStr := c.DefaultQuery("limit", "10")
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil || limit < 1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit"})
+		log.Println(err)
+		pkg.NewRes(http.StatusBadRequest, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
 		return
 	}
 
 	products, err := ph.productRepo.GetAllProducts(c.Request.Context(), foodType, page, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Println(err)
+		pkg.NewRes(http.StatusInternalServerError, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
 		return
 	}
 
-	c.JSON(http.StatusOK, products)
+	pkg.NewRes(http.StatusOK, products).Send(c)
 }
 
 func (ph ProductHandlerImpl) GetProductByID(c *gin.Context) {
 	productID := c.Param("id")
 	product, err := ph.productRepo.GetProductByID(c.Request.Context(), productID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Println(err)
+		pkg.NewRes(http.StatusNotFound, &config.Result{
+			Data:    nil,
+			Message: "Product not found",
+		}).Send(c)
 		return
 	}
 
-	c.JSON(http.StatusOK, product)
+	pkg.NewRes(http.StatusOK, product).Send(c)
 }

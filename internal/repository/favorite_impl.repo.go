@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"fmt"
+	"github.com/Roisfaozi/coffee-shop/config"
 	"time"
 
 	"github.com/Roisfaozi/coffee-shop/internal/models"
@@ -12,7 +14,7 @@ type FavoriteRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func (fr FavoriteRepositoryImpl) CreateFavorite(ctx context.Context, favorite *models.FavoriteRequest) (*models.FavoriteResponse, error) {
+func (fr FavoriteRepositoryImpl) CreateFavorite(ctx context.Context, favorite *models.FavoriteRequest) (*config.Result, error) {
 	tx, err := fr.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -40,11 +42,14 @@ func (fr FavoriteRepositoryImpl) CreateFavorite(ctx context.Context, favorite *m
 		return nil, err
 	}
 
-	return &models.FavoriteResponse{
-		ID:        favoriteID,
-		ProductID: favorite.ProductID,
-		UserID:    favorite.UserID,
-		CreatedAt: createdAt,
+	return &config.Result{
+		Data: &models.FavoriteResponse{
+			ID:        favoriteID,
+			ProductID: favorite.ProductID,
+			UserID:    favorite.UserID,
+			CreatedAt: createdAt,
+		},
+		Message: "Favorite created successfully",
 	}, nil
 }
 
@@ -52,12 +57,12 @@ func (fr FavoriteRepositoryImpl) DeleteFavorite(ctx context.Context, favoriteID 
 	query := "DELETE FROM favorite WHERE id=$1"
 	_, err := fr.db.ExecContext(ctx, query, favoriteID)
 	if err != nil {
-		return err
+		return fmt.Errorf("no favorite found with ID %s", favoriteID)
 	}
 	return nil
 }
 
-func (fr FavoriteRepositoryImpl) GetFavoritesByUserID(ctx context.Context, userID string) ([]*models.FavoriteResponse, error) {
+func (fr FavoriteRepositoryImpl) GetFavoritesByUserID(ctx context.Context, userID string) (*config.Result, error) {
 	query := `
         SELECT id, product_id, user_id, created_at
         FROM favorite
@@ -79,7 +84,10 @@ func (fr FavoriteRepositoryImpl) GetFavoritesByUserID(ctx context.Context, userI
 		}
 		favorites = append(favorites, &favorite)
 	}
-	return favorites, nil
+	return &config.Result{
+		Data:    favorites,
+		Message: "Favorites retrieved successfully",
+	}, nil
 }
 
 func NewFavoriteRepositoryImpl(db *sqlx.DB) *FavoriteRepositoryImpl {

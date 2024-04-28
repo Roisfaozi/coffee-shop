@@ -16,5 +16,5 @@ type UserResponse struct {
 	ID       string `db:"id" form:"id" json:"id"`
 	Username string `db:"username" form:"username" json:"username"`
 	Email    string `db:"email" form:"email" json:"email"`
-	Role     string `db:"role" form:"role" json:"role"`
 }
+type Users []User

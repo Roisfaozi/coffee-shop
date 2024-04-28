@@ -1,9 +1,12 @@
 package repository
 
 import (
+	"errors"
+	"github.com/Roisfaozi/coffee-shop/config"
 	"github.com/Roisfaozi/coffee-shop/helper"
 	"github.com/Roisfaozi/coffee-shop/internal/models"
 	"github.com/jmoiron/sqlx"
+	"log"
 )
 
 type UserRepositoryImpl struct {
@@ -14,7 +17,7 @@ func NewUserRepositoryImpl(DB *sqlx.DB) *UserRepositoryImpl {
 	return &UserRepositoryImpl{DB: DB}
 }
 
-func (user UserRepositoryImpl) Create(data *models.User) models.User {
+func (user UserRepositoryImpl) Create(data *models.User) (*config.Result, error) {
 	query := `
         INSERT INTO users(username, password, email, role) VALUES(:username,:password, :email, :role) RETURNING id, created_at, updated_at
     `
@@ -22,63 +25,58 @@ func (user UserRepositoryImpl) Create(data *models.User) models.User {
 	_, err := user.NamedExec(query, data)
 	helper.PanicIfError(err)
 	q := `
-        SELECT * FROM users WHERE username=$1
+        SELECT id, username, email FROM users WHERE username=$1
     `
 
 	var foundUser models.User
 	err = user.Get(&foundUser, q, data.Username)
 	if err != nil {
-		return models.User{}
+		log.Println(err)
+		return nil, err
 	}
-	data.ID = foundUser.ID
-	return *data
+
+	return &config.Result{Data: models.UserResponse{ID: foundUser.ID,
+		Username: foundUser.Username,
+		Email:    foundUser.Email,
+	}, Message: "1 data user created"}, nil
 }
 
-func (user UserRepositoryImpl) Update(data *models.User) models.User {
+func (user UserRepositoryImpl) FindById(userid string) (*config.Result, error) {
 	query := `
-        UPDATE users
-SET username = :username,
-    email = :email,
-    role = :role
-WHERE id=:id RETURNING id, username, email, role, created_at, updated_at
-    `
-
-	_, err := user.NamedExec(query, data)
-	helper.PanicIfError(err)
-
-	return *data
-}
-
-func (user UserRepositoryImpl) Delete(data *models.User) {
-	query := `
-        DELETE FROM users WHERE id=$1
-    `
-
-	_, err := user.Exec(query, data.ID)
-	helper.PanicIfError(err)
-}
-
-func (user UserRepositoryImpl) FindById(userid string) (models.User, error) {
-	query := `
-        SELECT * FROM users WHERE id=$1
+        SELECT id, username, email FROM users WHERE id=$1
     `
 
 	var foundUser models.User
 	err := user.Get(&foundUser, query, userid)
 	if err != nil {
-		return models.User{}, err
+		log.Println(err)
+		return nil, err
 	}
-	return foundUser, nil
+	return &config.Result{Data: foundUser, Message: "Success get user Data"}, nil
 }
 
-func (user UserRepositoryImpl) FindAll() []models.User {
+func (user UserRepositoryImpl) FindAll() (*config.Result, error) {
 	query := `
-        SELECT * FROM users
+         SELECT id, username, email FROM users
     `
-
 	var foundUsers []models.User
 	err := user.Select(&foundUsers, query)
-	helper.PanicIfError(err)
+	if err != nil {
+		return nil, err
+	}
+	return &config.Result{Data: foundUsers, Message: "Success get all user Data"}, nil
+}
 
-	return foundUsers
+func (user UserRepositoryImpl) GetAuthUser(userid string) (*models.User, error) {
+	var result models.User
+	q := `SELECT id, username, role, password FROM users WHERE username =?`
+
+	if err := user.Get(&result, user.Rebind(q), userid); err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return nil, errors.New("username not found")
+		}
+		return nil, err
+	}
+
+	return &result, nil
 }

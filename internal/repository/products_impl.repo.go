@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"github.com/Roisfaozi/coffee-shop/config"
+	"math"
 	"time"
 
 	"github.com/Roisfaozi/coffee-shop/internal/models"
@@ -16,7 +18,7 @@ func NewProductRepositoryImpl(db *sqlx.DB) *ProductRepositoryImpl {
 	return &ProductRepositoryImpl{db}
 }
 
-func (pr *ProductRepositoryImpl) CreateProduct(ctx context.Context, product *models.ProductRequest) (*models.ProductResponse, error) {
+func (pr *ProductRepositoryImpl) CreateProduct(ctx context.Context, product *models.ProductRequest) (*config.Result, error) {
 	tx, err := pr.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -64,7 +66,10 @@ func (pr *ProductRepositoryImpl) CreateProduct(ctx context.Context, product *mod
 		return nil, err
 	}
 
-	return &models.ProductResponse{ID: productID}, nil
+	return &config.Result{
+		Data:    &models.ProductResponse{ID: productID},
+		Message: "Product created successfully",
+	}, nil
 }
 
 func (pr *ProductRepositoryImpl) UpdateProduct(ctx context.Context, productID string, product *models.ProductRequest) error {
@@ -129,8 +134,7 @@ func (pr *ProductRepositoryImpl) DeleteProduct(ctx context.Context, productID st
 
 	return nil
 }
-
-func (pr *ProductRepositoryImpl) GetAllProducts(ctx context.Context, foodType string, page, limit int) ([]*models.Product, error) {
+func (pr *ProductRepositoryImpl) GetAllProducts(ctx context.Context, foodType string, page, limit int) (*config.Result, error) {
 	offset := (page - 1) * limit
 
 	productQuery := `
@@ -152,12 +156,14 @@ func (pr *ProductRepositoryImpl) GetAllProducts(ctx context.Context, foodType st
 	}
 	defer rows.Close()
 
+	var products []*models.Product
 	productMap := make(map[string]*models.Product)
 	for rows.Next() {
 		var product models.Product
 		if err := rows.Scan(&product.ID, &product.Name, &product.Price, &product.Currency, &product.Description, &product.ImageURL, &product.Category, &product.CreatedAt, &product.UpdatedAt); err != nil {
 			return nil, err
 		}
+		products = append(products, &product)
 		productMap[product.ID] = &product
 	}
 
@@ -181,14 +187,33 @@ func (pr *ProductRepositoryImpl) GetAllProducts(ctx context.Context, foodType st
 		}
 	}
 
-	var products []*models.Product
-	for _, product := range productMap {
-		products = append(products, product)
+	// Calculate total count of products (assuming it's not affected by pagination)
+	totalCountQuery := `SELECT COUNT(*) FROM product WHERE category ILIKE '%' || $1 || '%'`
+	var totalCount int
+	if err := pr.db.QueryRowContext(ctx, totalCountQuery, foodType).Scan(&totalCount); err != nil {
+		return nil, err
 	}
-	return products, nil
+
+	// Calculate metadata for pagination
+	totalPages := int(math.Ceil(float64(totalCount) / float64(limit)))
+	var next, prev interface{}
+	if page < totalPages {
+		next = page + 1
+	}
+	if page > 1 {
+		prev = page - 1
+	}
+
+	meta := &config.Metas{
+		Total: totalCount,
+		Next:  next,
+		Prev:  prev,
+	}
+
+	return &config.Result{Data: products, Meta: meta}, nil
 }
 
-func (pr *ProductRepositoryImpl) GetProductByID(ctx context.Context, productID string) (*models.Product, error) {
+func (pr *ProductRepositoryImpl) GetProductByID(ctx context.Context, productID string) (*config.Result, error) {
 	query := `SELECT * FROM product WHERE id=$1`
 	var product models.Product
 	err := pr.db.GetContext(ctx, &product, query, productID)
@@ -216,5 +241,5 @@ func (pr *ProductRepositoryImpl) GetProductByID(ctx context.Context, productID s
 		product.Sizes = append(product.Sizes, &size)
 	}
 
-	return &product, nil
+	return &config.Result{Data: product}, nil
 }

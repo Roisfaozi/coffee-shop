@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"github.com/Roisfaozi/coffee-shop/config"
 	"github.com/Roisfaozi/coffee-shop/internal/models"
 	"github.com/Roisfaozi/coffee-shop/internal/repository"
+	"github.com/Roisfaozi/coffee-shop/pkg"
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -16,52 +20,39 @@ type UserHandlerImpl struct {
 }
 
 func (uh UserHandlerImpl) Create(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	var err error
+	user := models.User{
+		Role: "user",
 	}
-	createdUser := uh.UserRepository.Create(&user)
-	userResponse := &models.UserResponse{
-		createdUser.ID,
-		createdUser.Username,
-		createdUser.Email,
-		createdUser.Role,
-	}
-	c.JSON(http.StatusCreated, userResponse)
-}
-
-func (uh UserHandlerImpl) Update(c *gin.Context) {
-	userID := c.Param("id")
-
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	if _, err := uh.UserRepository.FindById(userID); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+	if err = c.ShouldBindJSON(&user); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	user.ID = userID
-	user = uh.UserRepository.Update(&user)
-
-	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
-}
-
-func (uh UserHandlerImpl) Delete(c *gin.Context) {
-	userID := c.Param("id")
-
-	user, err := uh.UserRepository.FindById(userID)
+	_, err = govalidator.ValidateStruct(&user)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		log.Println(err)
+		pkg.NewRes(http.StatusUnauthorized, &config.Result{Data: err.Error()}).Send(c)
 		return
 	}
 
-	uh.UserRepository.Delete(&user)
+	user.Password, err = pkg.HashPassword(user.Password)
+	if err != nil {
+		log.Println(err)
+		pkg.NewRes(http.StatusUnauthorized, &config.Result{Data: err.Error()}).Send(c)
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+	createdUser, err := uh.UserRepository.Create(&user)
+	if err != nil {
+		log.Println(err)
+		pkg.NewRes(http.StatusUnauthorized, &config.Result{
+			Data:    nil,
+			Message: err.Error(),
+		}).Send(c)
+		return
+	}
+	pkg.NewRes(http.StatusCreated, createdUser).Send(c)
 }
 
 func (uh UserHandlerImpl) FindById(c *gin.Context) {
@@ -69,31 +60,20 @@ func (uh UserHandlerImpl) FindById(c *gin.Context) {
 
 	user, err := uh.UserRepository.FindById(userID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		log.Println(err.Error())
+		c.JSON(http.StatusNotFound, gin.H{"error": "User Not Found"})
 		return
 	}
 
-	userResponse := &models.UserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		Email:    user.Email,
-		Role:     user.Role,
-	}
-	c.JSON(http.StatusOK, userResponse)
+	pkg.NewRes(200, user).Send(c)
 }
 
 func (uh UserHandlerImpl) FindAll(c *gin.Context) {
 
-	users := uh.UserRepository.FindAll()
-	var userResponses []*models.UserResponse
-	for _, user := range users {
-		userResponse := &models.UserResponse{
-			ID:       user.ID,
-			Username: user.Username,
-			Email:    user.Email,
-			Role:     user.Role,
-		}
-		userResponses = append(userResponses, userResponse)
+	users, err := uh.UserRepository.FindAll()
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
-	c.JSON(http.StatusOK, userResponses)
+	pkg.NewRes(200, users).Send(c)
 }

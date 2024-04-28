@@ -16,6 +16,7 @@ func New(db *sqlx.DB) *gin.Engine {
 	user(router, db)
 	products(router, db)
 	favorite(router, db)
+	auth(router, db)
 	return router
 
 }
