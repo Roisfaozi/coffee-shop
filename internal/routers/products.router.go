@@ -14,8 +14,8 @@ func products(g *gin.Engine, d *sqlx.DB) {
 	repo := repository.NewProductRepositoryImpl(d)
 	handler := handlers.NewProductHandlerImpl(repo)
 
-	router.POST("/", middleware.Authjwt("admin"), handler.CreateProduct)
-	router.PUT("/:id", middleware.Authjwt("admin"), handler.UpdateProduct)
+	router.POST("/", middleware.Authjwt("admin"), middleware.Upload, handler.CreateProduct)
+	router.PUT("/:id", middleware.Authjwt("admin"), middleware.Upload, handler.UpdateProduct)
 	router.DELETE("/:id", middleware.Authjwt("admin"), handler.DeleteProduct)
 	router.GET("/", handler.GetAllProducts)
 	router.GET("/:id", middleware.Authjwt("admin", "user"), handler.GetProductByID)

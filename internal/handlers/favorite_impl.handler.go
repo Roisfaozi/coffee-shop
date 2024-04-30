@@ -25,7 +25,7 @@ func (fh FavoriteHandlerImpl) CreateFavorite(c *gin.Context) {
 			Message: err.Error(),
 		}).Send(c)
 		return
-		return
+
 	}
 	request.UserID = userID
 	favorite, err := fh.favoriteRepo.CreateFavorite(c.Request.Context(), &request)

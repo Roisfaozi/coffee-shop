@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"github.com/Roisfaozi/coffee-shop/config"
-	"github.com/Roisfaozi/coffee-shop/pkg"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/Roisfaozi/coffee-shop/config"
+	"github.com/Roisfaozi/coffee-shop/pkg"
 
 	"github.com/Roisfaozi/coffee-shop/internal/models"
 	"github.com/Roisfaozi/coffee-shop/internal/repository"
@@ -22,15 +23,15 @@ func NewProductHandlerImpl(productRepo repository.ProductRepository) *ProductHan
 
 func (ph ProductHandlerImpl) CreateProduct(c *gin.Context) {
 	var productReq models.ProductRequest
-	if err := c.ShouldBindJSON(&productReq); err != nil {
-		log.Println(err)
+	if err := c.ShouldBind(&productReq); err != nil {
+		log.Println("CreateProduct", err)
 		pkg.NewRes(http.StatusBadRequest, &config.Result{
 			Data:    nil,
 			Message: err.Error(),
 		}).Send(c)
 		return
 	}
-
+	productReq.ImageURL = c.MustGet("image_url").(string)
 	productRes, err := ph.productRepo.CreateProduct(c.Request.Context(), &productReq)
 	if err != nil {
 		log.Println(err)
