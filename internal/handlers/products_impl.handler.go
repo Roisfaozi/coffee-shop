@@ -45,18 +45,15 @@ func (ph ProductHandlerImpl) CreateProduct(c *gin.Context) {
 }
 
 func (ph ProductHandlerImpl) UpdateProduct(c *gin.Context) {
-
 	productID := c.Param("id")
 	var productReq models.ProductRequest
-	if err := c.ShouldBindJSON(&productReq); err != nil {
-		log.Println(err)
+	if err := c.ShouldBind(&productReq); err != nil {
 		pkg.NewRes(http.StatusBadRequest, &config.Result{
 			Data:    nil,
 			Message: err.Error(),
 		}).Send(c)
 		return
 	}
-
 	_, err := ph.productRepo.GetProductByID(c.Request.Context(), productID)
 	if err != nil {
 		log.Println(err)
@@ -67,9 +64,11 @@ func (ph ProductHandlerImpl) UpdateProduct(c *gin.Context) {
 		return
 	}
 
+	productReq.ImageURL = c.MustGet("image_url").(string)
+
 	err = ph.productRepo.UpdateProduct(c.Request.Context(), productID, &productReq)
 	if err != nil {
-		log.Println(err)
+		log.Println(productReq)
 		pkg.NewRes(http.StatusInternalServerError, &config.Result{
 			Data:    nil,
 			Message: err.Error(),

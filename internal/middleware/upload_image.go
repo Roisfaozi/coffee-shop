@@ -11,7 +11,7 @@ func Upload(ctx *gin.Context) {
 	file, err := ctx.FormFile("image_banner")
 	if err != nil {
 		if err.Error() == "http: no such file" {
-			ctx.Set("image", "")
+			ctx.Set("image_url", "")
 			ctx.Next()
 			return
 		}
@@ -19,7 +19,6 @@ func Upload(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Missing file"})
 		return
 	}
-
 	src, err := file.Open()
 	if err != nil {
 		log.Println("upload src err:", err)
