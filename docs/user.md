@@ -20,26 +20,26 @@ Response Body Success :
 
 ```json
 {
-  "id": "65e5361b-1d04-46ee-ba6f-9488b5693654",
-  "username": "Testing-1713977486",
-  "email": "testing@example.com",
-  "role": "user"
+  "status": "Created",
+  "data": {
+    "id": "6b45af65-e7f9-42eb-b47b-ed952a894c4b",
+    "username": "Testing-1714658608",
+    "email": "testing@example.com"
+  },
+  "description": "1 data user created"
 }
 ```
+## Auth login user
 
+Endpoint : POST /auth/login
 
-## Update User API
-
-Endpoint : PUT /user/:userId
 
 Request Body :
 
 ```json
 {
   "username": "Testing-1713977486",
-  "password": "rahasiainimah",
-  "email": "testing@example.com",
-  "role": "user"
+  "password": "rahasiainimah"
 }
 ```
 
@@ -47,10 +47,8 @@ Response Body Success :
 
 ```json
 {
-  "id": "65e5361b-1d04-46ee-ba6f-9488b5693654",
-  "username": "Testing-1713977486",
-  "email": "testing@example.com",
-  "role": "user"
+  "status": "OK",
+  "data": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg2MjIyODkwLWY1ZWEtNGZkMy04MWM5LTIzMjMzNzQ4NjBlMCIsInJvbGUiOiJhZG1pbiIsImlzcyI6ImJhY2tHb2xhbmciLCJleHAiOjE3MTQ2NTg2NTZ9.G0dQcVvb4YRkiaAv2prQ5aEwb3wty1-6QLFji62mSVc"
 }
 ```
 
@@ -63,18 +61,25 @@ Response Body Success :
 
 ```json
 [
-    {
-      "id": "65e5361b-1d04-46ee-ba6f-9488b5693654",
-      "username": "Testing-1713977486",
-      "email": "testing@example.com",
-      "role": "user"
-    },
-    {
-        "id": "c91c37c2-4749-45d0-b53e-d495faec9001",
-        "username": "Testing-1713977487",
+  {
+    "status": "OK",
+    "data": [
+      {
+        "id": "f446ce7c-57f6-4edf-8a6b-a67dc7162c61",
+        "username": "Testing-1714311147",
         "email": "testing@example.com",
-        "role": "user"
-    }
+        "created_at": "0001-01-01T00:00:00Z",
+        "updated_at": "0001-01-01T00:00:00Z"
+      },
+      {
+        "id": "28e54fb7-fee5-4fda-8a46-e1bc86d7cc95",
+        "username": "Testing-1714312883",
+        "email": "testing@example.com",
+        "created_at": "0001-01-01T00:00:00Z",
+        "updated_at": "0001-01-01T00:00:00Z"
+      }
+    ]
+  }
 ]
 ```
 
@@ -87,22 +92,14 @@ Response Body Success :
 
 ```json 
 {
-  "id": "a3c1d8e0-5ce2-4e5e-bda6-2aaf5b067b34",
-  "username": "Testing-1713980003",
-  "email": "testing@example.com",
-  "role": "user"
-}
-```
-
-
-## Remove Address API
-
-Endpoint : DELETE /user/:userId
-
-Response Body Success :
-
-```json
-{
-  "message": "User deleted successfully"
+  "status": "OK",
+  "data": {
+    "id": "6b45af65-e7f9-42eb-b47b-ed952a894c4b",
+    "username": "Testing-1714658608",
+    "email": "testing@example.com",
+    "created_at": "0001-01-01T00:00:00Z",
+    "updated_at": "0001-01-01T00:00:00Z"
+  },
+  "description": "Success get user Data"
 }
 ```

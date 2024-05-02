@@ -14,7 +14,7 @@ Request Body :
   "currency": "IDR",
   "description": "Deskripsi produk kopi yang luar biasa",
   "category": "Makanan",
-  "image_url": "https://example.com/tshirt.jpg"
+  "image_url": "https://example.com/tshirt.jpg" //"path/to/file
 }
 ```
 
@@ -22,7 +22,22 @@ Response Body Success :
 
 ```json
 {
-  "id": "2b6f9510-fa3e-4780-b2c1-44ef8ea7ade6"
+  "status": "Created",
+  "data": {
+    "id": "80d4defc-b576-4e12-a6f3-7cb2cbf607ff",
+    "username": "Testing-1714658925",
+    "email": "testing@example.com"
+  },
+  "description": "1 data user created"
+}
+```
+
+Response Body Failed token permission :
+
+```json
+{
+  "status": "Unauthorized",
+  "description": "You not have permission"
 }
 ```
 
@@ -40,7 +55,7 @@ Request Body :
   "currency": "IDR",
   "description": "Deskripsi produk kopi yang luar biasa",
   "category": "Makanan",
-  "image_url": "https://example.com/tshirt.jpg"
+  "image_url": "https://example.com/tshirt.jpg" //"path/to/file
 }
 ```
 
@@ -48,7 +63,17 @@ Response Body Success :
 
 ```json
 {
-  "message": "Product updated successfully"
+  "status": "OK",
+  "description": " Product updated successfully"
+}
+```
+
+Response Body Failed token permission :
+
+```json
+{
+  "status": "Unauthorized",
+  "description": "You not have permission"
 }
 ```
 
@@ -60,33 +85,70 @@ Endpoint : GET /products/
 Response Body Success :
 
 ```json
-[
-  {
-    "id": "1c442516-a2ad-4415-8382-55a3ea54f438",
-    "name": "Nasi Goreng",
-    "price": 30000,
-    "currency": "IDR",
-    "description": "Deskripsi produk kopi yang luar biasa",
-    "image_url": "https://example.com/tshirt.jpg",
-    "category": "Makanan",
-    "created_at": "2024-04-24T23:52:11.442218Z",
-    "updated_at": "2024-04-24T23:52:11.442218Z",
-    "sizes": [
-      {
-        "id": "fe140f05-ddbe-4529-b65b-c07111e0d45c",
-        "size_name": "R"
-      },
-      {
-        "id": "bcfef6fe-d2a1-423d-8623-3cd4157a7e21",
-        "size_name": "L"
-      },
-      {
-        "id": "5c8a1a69-346c-4cb6-8921-b93f61a92d88",
-        "size_name": "XL"
-      }
-    ]
-  }
-]
+{
+  "status": "OK",
+  "data": [
+    {
+      "id": "474782d6-a163-4aa8-8f8c-5508c6cf92ff",
+      "name": "Nasi Goreng v#",
+      "price": 30000,
+      "currency": "IDR",
+      "description": "Deskripsi produk kopi yang luar biasa",
+      "image_url": "https://example.com/tshirt.jpg",
+      "category": "Makanan",
+      "created_at": "2024-04-28T22:26:25.406898Z",
+      "updated_at": "2024-04-28T22:26:25.406898Z",
+      "sizes": [
+        {
+          "id": "ac53f05a-2d88-4562-bef1-301d32dff13e",
+          "size_name": "R"
+        },
+        {
+          "id": "be25d8ae-ccc0-4b52-9e21-12633bc77bd2",
+          "size_name": "L"
+        },
+        {
+          "id": "6ab889b0-a10d-4f92-ab26-d70710205a9e",
+          "size_name": "XL"
+        }
+      ]
+    },
+    {
+      "id": "4f620515-2ac7-4434-bb9e-a1d511d50708",
+      "name": "Nasi Goreng v#",
+      "price": 30000,
+      "currency": "IDR",
+      "description": "Deskripsi produk kopi yang luar biasa",
+      "image_url": "https://example.com/tshirt.jpg",
+      "category": "Makanan",
+      "created_at": "2024-04-28T22:26:25.92881Z",
+      "updated_at": "2024-04-28T22:26:25.92881Z",
+      "sizes": [
+        {
+          "id": "ac53f05a-2d88-4562-bef1-301d32dff13e",
+          "size_name": "R"
+        },
+        {
+          "id": "be25d8ae-ccc0-4b52-9e21-12633bc77bd2",
+          "size_name": "L"
+        },
+        {
+          "id": "6ab889b0-a10d-4f92-ab26-d70710205a9e",
+          "size_name": "XL"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Response Body Failed token permission :
+
+```json
+{
+  "status": "Unauthorized",
+  "description": "You not have permission"
+}
 ```
 
 
@@ -98,29 +160,41 @@ Response Body Success :
 
 ```json 
 {
-  "id": "2b6f9510-fa3e-4780-b2c1-44ef8ea7ade6",
-  "name": "Nasi Goreng v3",
-  "price": 30000,
-  "currency": "IDR",
-  "description": "Deskripsi produk kopi yang luar biasa",
-  "image_url": "https://example.com/tshirt.jpg",
-  "category": "Makanan",
-  "created_at": "2024-04-25T00:40:48.245353Z",
-  "updated_at": "2024-04-25T00:41:14.858454Z",
-  "sizes": [
-    {
-      "id": "fe140f05-ddbe-4529-b65b-c07111e0d45c",
-      "size_name": "R"
-    },
-    {
-      "id": "bcfef6fe-d2a1-423d-8623-3cd4157a7e21",
-      "size_name": "L"
-    },
-    {
-      "id": "5c8a1a69-346c-4cb6-8921-b93f61a92d88",
-      "size_name": "XL"
-    }
-  ]
+  "status": "OK",
+  "data": {
+    "id": "8e61447b-8d41-4f6c-acce-a8772c17b52e",
+    "name": "Nasi Goreng Pedas",
+    "price": 50000,
+    "currency": "IDR",
+    "description": "Deskripsi produk kopi yang luar biasa",
+    "image_url": "http://res.cloudinary.com/dfs7nermk/image/upload/v1714658962/Coffee_shop/mxfeymtf2lc73jjm1lxz.jpg",
+    "category": "Makanan",
+    "created_at": "2024-05-02T20:39:33.115893Z",
+    "updated_at": "2024-05-02T21:09:21.390339Z",
+    "sizes": [
+      {
+        "id": "ac53f05a-2d88-4562-bef1-301d32dff13e",
+        "size_name": "R"
+      },
+      {
+        "id": "be25d8ae-ccc0-4b52-9e21-12633bc77bd2",
+        "size_name": "L"
+      },
+      {
+        "id": "6ab889b0-a10d-4f92-ab26-d70710205a9e",
+        "size_name": "XL"
+      }
+    ]
+  }
+}
+```
+
+Response Body Failed token permission :
+
+```json
+{
+  "status": "Unauthorized",
+  "description": "You not have permission"
 }
 ```
 
@@ -133,6 +207,7 @@ Response Body Success :
 
 ```json
 {
-  "message": "Product deleted successfully"
+  "status": "OK",
+  "description": "Product deleted successfully"
 }
 ```
