@@ -26,12 +26,12 @@ type ProductSize struct {
 }
 
 type ProductRequest struct {
-	Name        string   `json:"name" form:"name" db:"name" binding:"required"`
-	Price       int      `json:"price" form:"price" db:"price" binding:"required"`
-	Currency    string   `json:"currency" form:"currency" db:"currency" binding:"required"`
-	Description string   `json:"description" form:"description" db:"description"`
-	ImageURL    string   `json:"image_url" form:"image_url" db:"image_url"`
-	Category    string   `json:"category" form:"category" db:"category"`
+	Name        string   `json:"name" form:"name" db:"name" binding:"required" valid:"type(string),required"`
+	Price       int      `json:"price" form:"price" db:"price" binding:"required" valid:"type(int),required"`
+	Currency    string   `json:"currency" form:"currency" db:"currency" binding:"required" valid:"type(string),required"`
+	Description string   `json:"description" form:"description" db:"description" valid:"type(string)"`
+	ImageURL    string   `json:"image_url" form:"image_url" db:"image_url"  valid:"type(string)"`
+	Category    string   `json:"category" form:"category" db:"category" valid:"type(string)"`
 	SizeIDs     []string `json:"size_ids"`
 }
 
