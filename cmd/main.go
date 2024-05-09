@@ -11,7 +11,7 @@ import (
 func main() {
 	db, err := pkg.Posql()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("ini error db start", err)
 	}
 
 	router := routers.New(db)

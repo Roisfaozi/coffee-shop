@@ -1,0 +1,61 @@
+services:
+  cafe_db:
+    container_name: cafe_db
+    image: postgres:latest
+    ports:
+      - '5436:5432'
+    environment:
+      POSTGRES_DB: go-coffee-shop
+      POSTGRES_USER: rois
+      POSTGRES_PASSWORD: rois
+    networks:
+      - coffee_net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  cafe_server:
+    container_name: cafe_server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 'go-server'
+    ports:
+      - '8081:8081'
+    networks:
+      - coffee_net
+    depends_on:
+      - cafe_db
+    environment:
+      - DB_HOST=cafe_db
+      - DB_NAME=go-coffee-shop
+      - DB_USER=rois
+      - DB_PASS=rois
+    restart: always
+
+  migrate:
+    container_name: cafe_server_migrate
+    image: migrate/migrate:v4.15.2
+    profiles: ['tools']
+    volumes:
+      - ./database/migrations:/migrations
+    entrypoint:
+      [
+        'migrate',
+        '-path',
+        '/migrations',
+        '-database',
+        'postgres://rois:rois@cafe_db:5432/go-coffee-shop?sslmode=disable',
+      ]
+    command: ['up']
+    networks:
+      - coffee_net
+    depends_on:
+      - cafe_db
+
+volumes:
+  postgres_data:
+
+networks:
+  coffee_net:
+    name: coffee_net
+    driver: bridge
