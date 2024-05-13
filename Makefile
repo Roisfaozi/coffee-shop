@@ -12,7 +12,7 @@ install:
 run:
 	CGO_ENABLED=0 GOOS=linux go build -o ${BUILD} ./cmd/main.go
 
-test:
+testing:
 	go test -cover -v ./...
 
 migrate-init:

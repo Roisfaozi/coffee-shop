@@ -15,7 +15,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -v -o /coffeback/server ./cmd/main.go
 
 RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-CMD ["wait-for-postgres.sh", "cafe_db", "migrate", "-path", "./database/migrations", "-database", "postgresql://rois:rois@cafe_db:5432/go-coffee-shop?sslmode=disable", "-verbose", "up"]
+CMD ["wait_for_postgres.sh", "cafe_db", "migrate", "-path", "./database/migrations", "-database", "postgresql://rois:rois@cafe_db:5432/go-coffee-shop?sslmode=disable", "-verbose", "up"]
 
 FROM alpine:3.14
 

@@ -67,7 +67,7 @@ truncate TABLE favorite cascade;
 truncate TABLE users cascade;
 
 select * from product where id = '4fbbc3a2-8516-4d9b-a5e5-5b64790237d6';
-select * from users;
+select * from users where username='Testing-1715526473';
 
 insert into size(size_name) values ('R');
 insert into size(size_name) values ('L');

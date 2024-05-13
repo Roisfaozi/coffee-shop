@@ -1,0 +1,9 @@
+./build
+./docs
+*.md
+Makefile
+seedProduct.json
+database.sql
+.env.example
+.idea
+./test
