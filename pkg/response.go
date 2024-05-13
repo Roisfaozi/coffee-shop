@@ -25,6 +25,7 @@ func NewRes(code int, data *config.Result) *Response {
 		Code:   code,
 		Status: getStatus(code),
 	}
+
 	if response.Code >= 400 {
 		if data.Data != nil {
 			response.Description = fmt.Sprintf("%v", data.Data)
