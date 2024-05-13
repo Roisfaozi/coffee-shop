@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"time"
@@ -25,6 +26,9 @@ func NewToken(uid, role string) *claims {
 
 func (c *claims) Generate() (string, error) {
 	screts := os.Getenv("JWT_KEYS")
+	if c == nil || c.Id == "" || c.Role == "" {
+		return "", errors.New("claim struct must not be nil or empty")
+	}
 
 	tokens := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	return tokens.SignedString([]byte(screts))
