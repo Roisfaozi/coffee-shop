@@ -1,9 +1,18 @@
 package pkg
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"errors"
+	"golang.org/x/crypto/bcrypt"
+)
 
 func HashPassword(password string) (string, error) {
+
+	if password == "" {
+		return "", errors.New("password is empty")
+	}
+
 	hasedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
 	if err != nil {
 		return "", err
 	}
