@@ -52,6 +52,7 @@ func (user UserRepositoryImpl) FindById(userid string) (*config.Result, error) {
 		log.Println(err)
 		return nil, err
 	}
+
 	return &config.Result{Data: foundUser, Message: "Success get user Data"}, nil
 }
 
@@ -77,6 +78,5 @@ func (user UserRepositoryImpl) GetAuthUser(userid string) (*models.User, error) 
 		}
 		return nil, err
 	}
-
 	return &result, nil
 }

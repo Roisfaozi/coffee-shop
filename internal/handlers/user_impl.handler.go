@@ -32,7 +32,7 @@ func (uh UserHandlerImpl) Create(c *gin.Context) {
 	_, err = govalidator.ValidateStruct(&user)
 	if err != nil {
 		log.Println(err)
-		pkg.NewRes(http.StatusUnauthorized, &config.Result{Data: err.Error()}).Send(c)
+		pkg.NewRes(http.StatusBadRequest, &config.Result{Data: err.Error()}).Send(c)
 		return
 	}
 
@@ -61,18 +61,21 @@ func (uh UserHandlerImpl) FindById(c *gin.Context) {
 	user, err := uh.UserRepository.FindById(userID)
 	if err != nil {
 		log.Println(err.Error())
-		c.JSON(http.StatusNotFound, gin.H{"error": "User Not Found"})
+		pkg.NewRes(http.StatusNotFound, &config.Result{
+			Data:    nil,
+			Message: "User Not Found",
+		}).Send(c)
 		return
 	}
 
-	pkg.NewRes(200, user).Send(c)
+	pkg.NewRes(http.StatusOK, user).Send(c)
 }
 
 func (uh UserHandlerImpl) FindAll(c *gin.Context) {
 
 	users, err := uh.UserRepository.FindAll()
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	pkg.NewRes(200, users).Send(c)
