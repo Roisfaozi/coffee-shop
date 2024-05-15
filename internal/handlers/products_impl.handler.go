@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/asaskevich/govalidator"
 	"log"
 	"net/http"
 	"strconv"
@@ -31,6 +32,14 @@ func (ph ProductHandlerImpl) CreateProduct(c *gin.Context) {
 		}).Send(c)
 		return
 	}
+
+	_, err := govalidator.ValidateStruct(&productReq)
+	if err != nil {
+		log.Println(err)
+		pkg.NewRes(http.StatusBadRequest, &config.Result{Data: err.Error()}).Send(c)
+		return
+	}
+
 	productReq.ImageURL = c.MustGet("image_url").(string)
 	productRes, err := ph.productRepo.CreateProduct(c.Request.Context(), &productReq)
 	if err != nil {
@@ -77,7 +86,7 @@ func (ph ProductHandlerImpl) UpdateProduct(c *gin.Context) {
 	}
 	pkg.NewRes(http.StatusOK, &config.Result{
 		Data:    nil,
-		Message: " Product updated successfully",
+		Message: "Product updated successfully",
 	}).Send(c)
 }
 
@@ -160,6 +169,5 @@ func (ph ProductHandlerImpl) GetProductByID(c *gin.Context) {
 		}).Send(c)
 		return
 	}
-
 	pkg.NewRes(http.StatusOK, product).Send(c)
 }
