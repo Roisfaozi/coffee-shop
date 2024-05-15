@@ -284,8 +284,8 @@ func TestFailedFindUserByIde(t *testing.T) {
 		mockUserService.On("FindById", mock.Anything).Return(nil, errors.New("User Not Found"))
 		k := httptest.NewRecorder()
 		router := gin.Default()
-		router.GET("/user", handler.FindAll)
 		handlers.NewUserHandlerImpl(mockUserService)
+		router.GET("/user/rere", handler.FindById)
 		// Create a new HTTP request
 		req, err := http.NewRequest("GET", "/user/ere", nil)
 		router.ServeHTTP(k, req)
