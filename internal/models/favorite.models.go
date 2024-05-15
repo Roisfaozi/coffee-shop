@@ -10,7 +10,7 @@ type Favorite struct {
 }
 
 type FavoriteRequest struct {
-	ProductID string `json:"product_id"`
+	ProductID string `json:"product_id" form:"product_id" db:"product_id" binding:"required"`
 	UserID    string `json:"user_id"`
 }
 

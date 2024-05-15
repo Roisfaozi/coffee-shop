@@ -54,7 +54,7 @@ func (fh FavoriteHandlerImpl) DeleteFavorite(c *gin.Context) {
 	}
 	pkg.NewRes(http.StatusOK, &config.Result{
 		Data:    nil,
-		Message: "Product updated successfully",
+		Message: "Favorite deleted successfully",
 	}).Send(c)
 }
 
