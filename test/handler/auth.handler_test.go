@@ -4,9 +4,11 @@ import (
 	"errors"
 	"github.com/Roisfaozi/coffee-shop/internal/handlers"
 	"github.com/Roisfaozi/coffee-shop/internal/models"
+	"github.com/Roisfaozi/coffee-shop/test/mocking"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -80,14 +82,33 @@ func TestLogin(t *testing.T) {
 		assert.JSONEq(t, `{"description": "Password is Salah", "status": "Bad Request"}`, w.Body.String())
 	})
 
+}
+func TestAuthLogin(t *testing.T) {
+	// Set up Gin
+	r := gin.Default()
+
+	// Mock user repository
+	var userRepoMock = mocking.MockUserRepository{}
+
+	// Create an instance of the AuthHandler
+	handler := handlers.NewAuthHandler(&userRepoMock)
+
+	// Set up the route
+	r.POST("/login", handler.Login)
+
 	t.Run("Login with wrong username", func(t *testing.T) {
 		var reqBodyUser = `{"username": "kalemboskueh","password": "rahasia"}`
 
 		userRepoMock.On("GetAuthUser", mock.Anything).Return(nil, errors.New("username not found"))
-		req := httptest.NewRequest("POST", "/login", strings.NewReader(reqBodyUser))
-		req.Header.Set("Content-type", "application/json")
+
 		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
+		router := gin.Default()
+		router.POST("/login", handler.Login)
+
+		req, _ := http.NewRequest("POST", "/login", strings.NewReader(reqBodyUser))
+
+		req.Header.Set("Content-type", "application/json")
+		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 401, w.Code)
 

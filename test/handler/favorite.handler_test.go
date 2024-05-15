@@ -176,6 +176,15 @@ func TestDeleteFavorite(t *testing.T) {
 		assert.Equal(t, "Favorite deleted successfully", responseBody["description"])
 	})
 
+}
+
+func TestFailedDeleteFavorite(t *testing.T) {
+	// Membuat mock untuk repository favorite
+	var favoriteRepoMock = mocking.MockFavoriteRepository{}
+
+	// Mode test untuk Gin
+	gin.SetMode(gin.TestMode)
+
 	t.Run("failed delete favorite with internal error", func(t *testing.T) {
 		favoriteID := "6ba10979-8f56-4e01-aaf9-56a492e51898"
 
@@ -217,47 +226,46 @@ func TestDeleteFavorite(t *testing.T) {
 		assert.Equal(t, "internal server error", responseBody["description"])
 	})
 
-	//
-	//t.Run("failed delete favorite with non-existent ID", func(t *testing.T) {
-	//	favoriteID := "non-existent-id"
-	//
-	//	// Mendaftarkan harapan untuk pemanggilan GetFavoritesByUserID
-	//	favoriteRepoMock.On("DeleteFavorite", mock.Anything, favoriteID).Return(nil, errors.New("Favorite not found"))
-	//
-	//	// Membuat server HTTP sementara
-	//	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-	//		// Menjalankan handler DeleteFavorite dengan request yang diberikan
-	//		ctx, _ := gin.CreateTestContext(w)
-	//		ctx.Request = req
-	//		ctx.Params = gin.Params{gin.Param{Key: "id", Value: favoriteID}}
-	//
-	//		handler := handlers.NewFavoriteHandlerImpl(&favoriteRepoMock)
-	//		handler.DeleteFavorite(ctx)
-	//	}))
-	//	defer server.Close()
-	//
-	//	// Membuat permintaan HTTP ke server
-	//	req, err := http.NewRequest(http.MethodDelete, server.URL+"/favorites/"+favoriteID, nil)
-	//	require.NoError(t, err)
-	//
-	//	resp, err := http.DefaultClient.Do(req)
-	//	require.NoError(t, err)
-	//	defer resp.Body.Close()
-	//
-	//	// Memeriksa respons
-	//	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
-	//
-	//	// Membaca dan memeriksa body respons
-	//	body, err := ioutil.ReadAll(resp.Body)
-	//	require.NoError(t, err)
-	//
-	//	var responseBody map[string]interface{}
-	//	err = json.Unmarshal(body, &responseBody)
-	//	require.NoError(t, err)
-	//
-	//	assert.Equal(t, "Not Found", responseBody["status"])
-	//	assert.Equal(t, "Favorite not found", responseBody["description"])
-	//})
+	t.Run("failed delete favorite with internal error", func(t *testing.T) {
+		favoriteID := "6ba10979-8f56-4e01-aaf9-56a492e51898"
+
+		// Mendaftarkan harapan untuk pemanggilan GetFavoritesByUserID dan DeleteFavorite
+		favoriteRepoMock.On("DeleteFavorite", mock.Anything, favoriteID).Return(errors.New("internal server error"))
+
+		// Membuat server HTTP sementara
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			// Menjalankan handler DeleteFavorite dengan request yang diberikan
+			ctx, _ := gin.CreateTestContext(w)
+			ctx.Request = req
+			ctx.Params = gin.Params{gin.Param{Key: "id", Value: favoriteID}}
+
+			handler := handlers.NewFavoriteHandlerImpl(&favoriteRepoMock)
+			handler.DeleteFavorite(ctx)
+		}))
+		defer server.Close()
+
+		// Membuat permintaan HTTP ke server
+		req, err := http.NewRequest(http.MethodDelete, server.URL+"/favorites/"+favoriteID, nil)
+		require.NoError(t, err)
+
+		resp, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		defer resp.Body.Close()
+
+		// Memeriksa respons
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+		// Membaca dan memeriksa body respons
+		body, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err)
+
+		var responseBody map[string]interface{}
+		err = json.Unmarshal(body, &responseBody)
+		require.NoError(t, err)
+
+		assert.Equal(t, "Internal Server Error", responseBody["status"])
+		assert.Equal(t, "internal server error", responseBody["description"])
+	})
 
 }
 
@@ -315,6 +323,16 @@ func TestGetFavoritesByUserID(t *testing.T) {
 		assert.Equal(t, "Favorites retrieved successfully", responseBody["description"])
 		assert.NotNil(t, responseBody["data"])
 	})
+
+}
+
+func TestFailedGetFavoritesByUserID(t *testing.T) {
+	// Membuat mock untuk repository favorite
+	var favoriteRepoMock = mocking.MockFavoriteRepository{}
+
+	// Mode test untuk Gin
+	gin.SetMode(gin.TestMode)
+
 	t.Run("failed get favorites by user ID with non-existent user", func(t *testing.T) {
 		userID := "non-existent-id"
 

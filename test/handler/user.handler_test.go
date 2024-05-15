@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -292,8 +291,6 @@ func TestFailedFindUserByIde(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		assert.NoError(t, err)
 		router.ServeHTTP(k, req)
-
-		fmt.Println(k.Body.String())
 
 		assert.Equal(t, http.StatusNotFound, k.Code)
 		mockUserService.AssertNotCalled(t, "GET", mock.Anything)
